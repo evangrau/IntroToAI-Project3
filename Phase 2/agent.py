@@ -1,4 +1,5 @@
 import random
+import os.path as op
 
 def flips( board, index, piece, step ):
    # other - opponent's piece
@@ -41,18 +42,43 @@ def isValidMove( b, x, p ): # board, index, piece
 class Agent:
 
     symbol = 'O'
+    kb = 'Phase 2/move_knowledgebase.txt'
 
-    def __init__( self, xORo ):
-      self.symbol = xORo
+    def __init__( self ):
+        # read in the move dictionary
+        self.move_dictionary = {}
+        # read in the knowledgebase to a dictionary if it exists 
+        # (only time that will not occur is the first time running)
+        if op.isfile(self.kb):
+            with open(self.kb, 'r') as file:
+                for line in file:
+                    items = line.strip().split(',')
+                    key = items[0]
+                    value = ','.join(items[1:])
+                    self.move_dictionary[key] = value
+                file.close()
+    
 
-    def startGame( piece ):
+    def startGame( self, piece ):
+        # set piece to be played with
+        self.symbol = piece
+    
+    def getMove( self, board ):
+        move = 0
+        value = self.move_dictionary.get(board)
+        if value != None:
+            line = value.strip().split(',')
+            elements = [int(line[i]) for i in range(0, len(line), 2)]
+            probabilities = [float(line[i+1]) for i in range(0, len(line), 2)]
+            move = random.choices(elements, probabilities)
+        return move
+    
+    def endGame( self, status, board ):
         return
     
-    def getMove( board ):
-        return
-    
-    def endGame( status, board ):
-        return
-    
-    def stopPlaying():
-        return
+    def stopPlaying( self ):
+        with open(self.kb, 'w') as file:
+            for key, value in self.move_dictionary.items():
+                line = f"{key},{value}\n"
+                file.write(line)
+            file.close()
