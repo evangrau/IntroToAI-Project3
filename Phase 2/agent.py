@@ -45,7 +45,7 @@ class Agent:
     kb = 'Phase 2/move_knowledgebase.txt'
 
     def __init__( self ):
-        # read in the move dictionary
+        # set the move dictionary
         self.move_dictionary = {}
         # read in the knowledgebase to a dictionary if it exists 
         # (only time that will not occur is the first time running)
@@ -64,13 +64,35 @@ class Agent:
         self.symbol = piece
     
     def getMove( self, board ):
-        move = 0
+        # set random valid move to start with
+        move = random.randint(0,36)
+        while not isValidMove(board, move ,self.symbol):
+            move = ( move + 1 ) % 36
+
+        # check to see if the dictionary contains probabilities for moves
         value = self.move_dictionary.get(board)
+        # if it does exist, then we get the move based on the probabilities
         if value != None:
             line = value.strip().split(',')
             elements = [int(line[i]) for i in range(0, len(line), 2)]
             probabilities = [float(line[i+1]) for i in range(0, len(line), 2)]
             move = random.choices(elements, probabilities)
+        # if it doesn't, then we keep the default random move
+        # and add the board state to the dictionary
+        else:
+            # find the number of valid moves first
+            count = 0
+            for spot in board:
+                if isValidMove(board, spot, self.symbol):
+                    count += 1
+            # calculate the equal probability of choosing those valid moves
+            prob = 1.0 / count
+            # add those valid moves and their probabilities to the dictionary
+            for i in range(len(board)):
+                if isValidMove(board, board[i], self.symbol):
+                    value += f",{i},{prob}"
+            self.move_dictionary[board] = value
+        # return the move
         return move
     
     def endGame( self, status, board ):
