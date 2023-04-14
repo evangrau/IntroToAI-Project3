@@ -125,8 +125,8 @@ gameboard = "--------------XO----OX--------------"
 gameover = False
 
 X = RandomPlayer('X') 
-O = RandomPlayer('O')
-#O = Agent('O') # use this when agent is implemented
+# O = RandomPlayer('O')
+O = Agent('O') # use this when agent is implemented
 
 # counters for tracking wins over multiple trials
 numWinX = 0
@@ -135,6 +135,7 @@ numTied = 0
 
 # how many games do you want to play?
 for g in range(1000):
+   print(f"Game {g + 1}")
    # reset global variables for new game
    gameboard = "--------------XO----OX--------------"
    gameover = False
