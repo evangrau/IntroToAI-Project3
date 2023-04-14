@@ -45,8 +45,17 @@ class Agent:
     kb = 'Phase 2/'
 
     def __init__( self, xORo ):
+        # call startGame
+        self.startGame(xORo)
+
+    def startGame( self, piece ):
         # set the symbol
-        self.symbol = xORo
+        self.symbol = piece
+
+        # declare move and board lists
+        self.boards = []
+        self.moves = []
+
         # declare the move dictionary
         self.move_dictionary = {}
 
@@ -68,6 +77,9 @@ class Agent:
                 file.close()
     
     def getMove( self, board ):
+        # add the board to the boards list
+        self.boards.append(board)
+
         # set random valid move to start with
         move = random.randint(0,36)
         while not isValidMove(board, move, self.symbol):
@@ -101,11 +113,21 @@ class Agent:
             value = value[:-1]
             # add board state and probabilities to the dictionary
             self.move_dictionary[board] = value
+
+        # add the move to the moves list
+        self.moves.append(move)
+            
         # return the move
         return move
     
     def endGame( self, status, board ):
-        return
+        # reverse the board and moves lists so we can start from the end
+        self.boards.reverse()
+        self.moves.reverse()
+
+        # delete everything in both lists to start over at the beginning of the next game
+        del self.boards[:]
+        del self.moves[:]
     
     def stopPlaying( self ):
         # write the new dictionary to the knowledgebase file

@@ -163,19 +163,19 @@ for g in range(1000):
             X.endGame(  1, gameboard )
             O.endGame( -1, gameboard )
             numWinX = numWinX + 1
-            #print( "X wins by " + str(status) + " pieces" )
+            print( "X wins by " + str(status) + " pieces" )
          elif status < 0: # O wins
             X.endGame( -1, gameboard )
             O.endGame(  1, gameboard )
             numWinO = numWinO + 1
-            #print( "O wins by " + str(-status) + " pieces" )
+            print( "O wins by " + str(-status) + " pieces" )
          else: # status == 0, tie game
             X.endGame(  0, gameboard )
             O.endGame(  0, gameboard )
             numTied = numTied + 1
-            #print( "Tie game" )
+            print( "Tie game" )
          gameover = True
-         #printBoard(gameboard)
+         printBoard(gameboard)
          
       move = move + 1
       
@@ -189,5 +189,5 @@ X.stopPlaying()
 O.stopPlaying()
 
 print( "X   : " + str(numWinX)  + " games" )
-print( "O   : " + str(numWinO) + " games ***" )
+print( "O   : " + str(numWinO)  + " games" )
 print( "Tie : " + str(numTied)  + " games" )
