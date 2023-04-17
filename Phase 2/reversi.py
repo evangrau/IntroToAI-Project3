@@ -1,4 +1,4 @@
-#from agent import Agent
+from agent import Agent
 from randomplayer import RandomPlayer
 import random
 import sys
@@ -128,8 +128,8 @@ gameboard = "--------------XO----OX--------------"
 gameover = False
 
 X = RandomPlayer('X')
-O = RandomPlayer('O')
-#O = Agent('O') # use this when agent is implemented
+# O = RandomPlayer('O')
+O = Agent('O') # use this when agent is implemented
 
 # counters for tracking wins over multiple trials
 numWinX = 0
@@ -137,7 +137,7 @@ numWinO = 0
 numTied = 0
 
 # how many games do you want to play?
-for g in range(1000):
+for g in range(10000):
    # reset global variables for new game
    gameboard = "--------------XO----OX--------------"
    gameover = False
@@ -190,6 +190,6 @@ for g in range(1000):
 X.stopPlaying()
 O.stopPlaying()
 
-print( "X   : " + str(numWinX)  + " games" )
-print( "O   : " + str(numWinO) + " games ***" )
-print( "Tie : " + str(numTied)  + " games" )
+print( f"X   : {numWinX} games : {(numWinX / (numWinX + numWinO + numTied)) * 100:.1f}%" )
+print( f"O   : {numWinO} games : {(numWinO / (numWinX + numWinO + numTied)) * 100:.1f}%" )
+print( f"Tie : {numTied} games : {(numTied / (numWinX + numWinO + numTied)) * 100:.1f}%" )

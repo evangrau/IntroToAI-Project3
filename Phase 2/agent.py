@@ -125,9 +125,11 @@ class Agent:
         return move
     
     def endGame( self, status, board ):
-        # reverse the board and moves lists so we can start from the end
+        # reverse the board and moves lists so we can start from the end of the game
         self.boards.reverse()
         self.moves.reverse()
+
+        # TODO: Fix reinforcement learning strategy
 
         for i in range(len(self.boards)):
             # check to see if the dictionary contains probabilities for moves
@@ -166,6 +168,13 @@ class Agent:
                for j in range(len(probabilities)):
                   if j != tile:
                      probabilities[j] += temp / len(elements)
+
+            # normalize probabilities so that they sum to 1
+            total_prob = sum(probabilities)
+            if total_prob == 0:
+                probabilities = [1.0 / len(probabilities) for i in range(len(probabilities))]
+            else:
+                probabilities = [p / total_prob for p in probabilities]
             
             # set value back to an empty string
             value = ""
