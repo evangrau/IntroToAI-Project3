@@ -1,22 +1,26 @@
 import random
 
+# decide if pieces are flippable in this direction
 def flips( board, index, piece, step ):
-   # other - opponent's piece
    other = ('X' if piece == 'O' else 'O')
    # is an opponent's piece in first spot that way?
    here = index + step
-   if board[here] != other:
+   if here < 0 or here >= 36 or board[here] != other:
       return False
-   # how is index mod changing?
-   diff = index % 6 - here % 6
-   while( here % 6 - ( here + step ) % 6 == diff and 
-          here > 0 and here < 36 and 
-          board[here] == other ):
-      here = here + step
-   return( here % 6 - ( here + step ) % 6 == diff and 
-           here > 0 and here < 36 and
-           board[here] == piece )
+      
+   if( abs(step) == 1 ): # moving left or right along row
+      while( here // 6 == index // 6 and board[here] == other ):
+         here = here + step
+      # are we still on the same row and did we find a matching endpiece?
+      return( here // 6 == index // 6 and board[here] == piece )
    
+   else: # moving up or down (possibly with left/right tilt)
+      while( here >= 0 and here < 36 and board[here] == other ):
+         here = here + step
+      # are we still on the board and did we find a matching endpiece?
+      return( here >= 0 and here < 36 and board[here] == piece )
+   
+# decide if this is a valid move
 def isValidMove( b, x, p ): # board, index, piece
    # invalid index
    if x < 0 or x >= 36:

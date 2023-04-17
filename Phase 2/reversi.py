@@ -1,4 +1,4 @@
-from agent import Agent
+#from agent import Agent
 from randomplayer import RandomPlayer
 import random
 import sys
@@ -8,17 +8,20 @@ def flips( board, index, piece, step ):
    other = ('X' if piece == 'O' else 'O')
    # is an opponent's piece in first spot that way?
    here = index + step
-   if board[here] != other:
+   if here < 0 or here >= 36 or board[here] != other:
       return False
-   # diff : how index mod is changing each step
-   diff = index % 6 - here % 6
-   while( here % 6 - ( here + step ) % 6 == diff and 
-          here > 0 and here < 36 and 
-          board[here] == other ):
-      here = here + step
-   return( here % 6 - ( here + step ) % 6 == diff and 
-           here > 0 and here < 36 and
-           board[here] == piece )
+      
+   if( abs(step) == 1 ): # moving left or right along row
+      while( here // 6 == index // 6 and board[here] == other ):
+         here = here + step
+      # are we still on the same row and did we find a matching endpiece?
+      return( here // 6 == index // 6 and board[here] == piece )
+   
+   else: # moving up or down (possibly with left/right tilt)
+      while( here >= 0 and here < 36 and board[here] == other ):
+         here = here + step
+      # are we still on the board and did we find a matching endpiece?
+      return( here >= 0 and here < 36 and board[here] == piece )
 
 # decide if given move (index x) is valid for player p
 def validMove( b, x, p ): # board, index, piece
@@ -124,9 +127,9 @@ def getEndgameStatus( board ):
 gameboard = "--------------XO----OX--------------"
 gameover = False
 
-X = RandomPlayer('X') 
-# O = RandomPlayer('O')
-O = Agent('O') # use this when agent is implemented
+X = RandomPlayer('X')
+O = RandomPlayer('O')
+#O = Agent('O') # use this when agent is implemented
 
 # counters for tracking wins over multiple trials
 numWinX = 0
@@ -135,27 +138,26 @@ numTied = 0
 
 # how many games do you want to play?
 for g in range(1000):
-   print(f"Game {g + 1}")
    # reset global variables for new game
    gameboard = "--------------XO----OX--------------"
    gameover = False
-      
+
    # play game until done
    move = 1
    while( not gameover ):
       if countPossibleMoves( gameboard, 'X' ) > 0:
          play = -1
          while not validMove( gameboard, play, 'X' ):
-            play = X.getMove( gameboard ) 
+            play = X.getMove( gameboard )
          applyMove( play, 'X' )
-      
+
       # player O
       if countPossibleMoves( gameboard, 'O' ) > 0:
          play = -1
          while not validMove( gameboard, play, 'O' ):
-            play = O.getMove( gameboard ) 
+            play = O.getMove( gameboard )
          applyMove( play, 'O' )
-      
+
       # if game over
       if countPossibleMoves( gameboard, 'X' ) + countPossibleMoves( gameboard, 'O' ) == 0:
          status = getEndgameStatus( gameboard )
@@ -163,31 +165,31 @@ for g in range(1000):
             X.endGame(  1, gameboard )
             O.endGame( -1, gameboard )
             numWinX = numWinX + 1
-            print( "X wins by " + str(status) + " pieces" )
+            #print( "X wins by " + str(status) + " pieces" )
          elif status < 0: # O wins
             X.endGame( -1, gameboard )
             O.endGame(  1, gameboard )
             numWinO = numWinO + 1
-            print( "O wins by " + str(-status) + " pieces" )
+            #print( "O wins by " + str(-status) + " pieces" )
          else: # status == 0, tie game
             X.endGame(  0, gameboard )
             O.endGame(  0, gameboard )
             numTied = numTied + 1
-            print( "Tie game" )
+            #print( "Tie game" )
          gameover = True
-         printBoard(gameboard)
-         
+         #printBoard(gameboard)
+
       move = move + 1
-      
+
    # when running thousands of learning trials,
    #   periodic updates are nice confirmation
    #   that everything's still running
-#   if (numWinX + numWinO + numTied) % 1000 == 0:
-#      print( "Completed " + str(numWinX + numWinO + numTied) )
+   if (numWinX + numWinO + numTied) % 1000 == 0:
+      print( "Completed " + str(numWinX + numWinO + numTied) )
 
 X.stopPlaying()
 O.stopPlaying()
 
 print( "X   : " + str(numWinX)  + " games" )
-print( "O   : " + str(numWinO)  + " games" )
+print( "O   : " + str(numWinO) + " games ***" )
 print( "Tie : " + str(numTied)  + " games" )

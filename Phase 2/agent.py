@@ -1,23 +1,27 @@
 import random
 import os.path as op
 
+# decide if pieces are flippable in this direction
 def flips( board, index, piece, step ):
-   # other - opponent's piece
    other = ('X' if piece == 'O' else 'O')
    # is an opponent's piece in first spot that way?
    here = index + step
-   if board[here] != other:
+   if here < 0 or here >= 36 or board[here] != other:
       return False
-   # how is index mod changing?
-   diff = index % 6 - here % 6
-   while( here % 6 - ( here + step ) % 6 == diff and 
-          here > 0 and here < 36 and 
-          board[here] == other ):
-      here = here + step
-   return( here % 6 - ( here + step ) % 6 == diff and 
-           here > 0 and here < 36 and
-           board[here] == piece )
+      
+   if( abs(step) == 1 ): # moving left or right along row
+      while( here // 6 == index // 6 and board[here] == other ):
+         here = here + step
+      # are we still on the same row and did we find a matching endpiece?
+      return( here // 6 == index // 6 and board[here] == piece )
    
+   else: # moving up or down (possibly with left/right tilt)
+      while( here >= 0 and here < 36 and board[here] == other ):
+         here = here + step
+      # are we still on the board and did we find a matching endpiece?
+      return( here >= 0 and here < 36 and board[here] == piece )
+   
+# decide if this is a valid move
 def isValidMove( b, x, p ): # board, index, piece
    # invalid index
    if x < 0 or x >= 36:
@@ -124,6 +128,57 @@ class Agent:
         # reverse the board and moves lists so we can start from the end
         self.boards.reverse()
         self.moves.reverse()
+
+        for i in range(len(self.boards)):
+            # check to see if the dictionary contains probabilities for moves
+            value = self.move_dictionary.get(self.boards[i])
+            # if it does exist, then we get the corresponding probabilities
+            if value != None:
+                line = value.strip().split(',')
+                elements = [int(line[i]) for i in range(0, len(line), 2)]
+                probabilities = [float(line[i+1]) for i in range(0, len(line), 2)]
+    
+            if status == 1:
+               # agent won, add 1/2^i to that prob and subtract the appropriate amount from the rest
+               mult = (1.0/2.0**i)
+               temp = 0
+               tile = 0
+               for j in range(len(elements)):
+                     if elements[j] == self.moves[i]:
+                        tile = elements[j]
+                        temp = probabilities[j] * mult
+                        probabilities[j] += temp
+                        break
+               for j in range(len(probabilities)):
+                  if j != tile:
+                     probabilities[j] -= temp / len(elements)
+            elif status == -1:
+               # agent lost, decrease that prob by 1/2^i and add the appropriate amount to the rest
+               mult = (1.0/2.0**i)
+               temp = 0
+               tile = 0
+               for j in range(len(elements)):
+                     if elements[j] == self.moves[i]:
+                        tile = elements[j]
+                        temp = probabilities[j] * mult
+                        probabilities[j] -= temp
+                        break
+               for j in range(len(probabilities)):
+                  if j != tile:
+                     probabilities[j] += temp / len(elements)
+            
+            # set value back to an empty string
+            value = ""
+
+            # iterate through the lists
+            for j in range(len(elements)):
+                value += f"{elements[j]},{probabilities[j]},"
+            
+            # remove the comma at the end
+            value = value[:-1]
+
+            # set the new probabilities in the dictionary
+            self.move_dictionary[self.boards[i]] = value
 
         # delete everything in both lists to start over at the beginning of the next game
         del self.boards[:]
