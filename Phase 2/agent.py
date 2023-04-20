@@ -46,7 +46,7 @@ def isValidMove( b, x, p ): # board, index, piece
 class Agent:
 
     symbol = 'O'
-    kb = 'Phase 2/'
+    kb = 'Phase2/'
 
     def __init__( self, xORo ):
         # call startGame
@@ -142,7 +142,7 @@ class Agent:
     
             if status == 1:
                # agent won, add 1/2^i to that prob and subtract the appropriate amount from the rest
-               mult = (1.0/2.0**i)
+               mult = 1/(i+1)#(1.0/2.0**i)
                temp = 0
                tile = 0
                for j in range(len(elements)):
@@ -156,7 +156,7 @@ class Agent:
                      probabilities[j] -= temp / len(elements)
             elif status == -1:
                # agent lost, decrease that prob by 1/2^i and add the appropriate amount to the rest
-               mult = (1.0/2.0**i)
+               mult = i/(i+1)#(1.0/2.0**i)
                temp = 0
                tile = 0
                for j in range(len(elements)):
@@ -175,6 +175,9 @@ class Agent:
                 probabilities = [1.0 / len(probabilities) for i in range(len(probabilities))]
             else:
                 probabilities = [p / total_prob for p in probabilities]
+            
+            # if(sum(probabilities) < .99 or sum(probabilities) > 1.01):
+            #     print(probabilities, " with a sum of ", sum(probabilities))
             
             # set value back to an empty string
             value = ""
