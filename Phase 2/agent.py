@@ -1,6 +1,8 @@
 import random
 import os.path as op
 
+PERCENTAGE = 1.0 # global learning decay variable
+
 # decide if pieces are flippable in this direction
 def flips( board, index, piece, step ):
    other = ('X' if piece == 'O' else 'O')
@@ -46,7 +48,7 @@ def isValidMove( b, x, p ): # board, index, piece
 class Agent:
 
     symbol = 'O'
-    kb = 'Phase2/'
+    kb = 'Phase 2/'
 
     def __init__( self, xORo ):
         # call startGame
@@ -129,55 +131,55 @@ class Agent:
         self.boards.reverse()
         self.moves.reverse()
 
-        # TODO: Fix reinforcement learning strategy
-
         for i in range(len(self.boards)):
             # check to see if the dictionary contains probabilities for moves
             value = self.move_dictionary.get(self.boards[i])
             # if it does exist, then we get the corresponding probabilities
             if value != None:
                 line = value.strip().split(',')
-                elements = [int(line[i]) for i in range(0, len(line), 2)]
-                probabilities = [float(line[i+1]) for i in range(0, len(line), 2)]
-    
+                elements = [int(line[j]) for j in range(0, len(line), 2)]
+                probabilities = [float(line[j+1]) for j in range(0, len(line), 2)]
+
             if status == 1:
-               # agent won, add 1/2^i to that prob and subtract the appropriate amount from the rest
-               mult = 1/(i+1)#(1.0/2.0**i)
-               temp = 0
-               tile = 0
-               for j in range(len(elements)):
-                     if elements[j] == self.moves[i]:
+                # agent won, add percentage/i to that prob and subtract the appropriate amount from the rest
+                mult = PERCENTAGE / (i + 1)
+                temp = 0
+                tile = 0
+                for j in range(len(elements)):
+                    if elements[j] == self.moves[i]:
                         tile = elements[j]
-                        temp = probabilities[j] * mult
-                        probabilities[j] += temp
+                        temp = probabilities[j] - (probabilities[j] * mult)
+                        probabilities[j] *= mult
                         break
-               for j in range(len(probabilities)):
-                  if j != tile:
-                     probabilities[j] -= temp / len(elements)
+                for j in range(len(probabilities)):
+                    if j != tile:
+                        probabilities[j] -= temp / len(elements)
             elif status == -1:
-               # agent lost, decrease that prob by 1/2^i and add the appropriate amount to the rest
-               mult = i/(i+1)#(1.0/2.0**i)
-               temp = 0
-               tile = 0
-               for j in range(len(elements)):
-                     if elements[j] == self.moves[i]:
+                # agent lost, decrease that prob by percentage/i and add the appropriate amount to the rest
+                mult = PERCENTAGE / (i + 1)
+                temp = 0
+                tile = 0
+                for j in range(len(elements)):
+                    if elements[j] == self.moves[i]:
                         tile = elements[j]
-                        temp = probabilities[j] * mult
+                        temp = probabilities[j] - (probabilities[j] * mult)
                         probabilities[j] -= temp
                         break
-               for j in range(len(probabilities)):
-                  if j != tile:
-                     probabilities[j] += temp / len(elements)
+                for j in range(len(probabilities)):
+                    if j != tile:
+                        probabilities[j] += temp / len(elements)
+
+            # look through probabilities to make sure there are no negatives
+            for j in range(len(probabilities)):
+                if probabilities[j] < 0.0:
+                    probabilities[j] = 0.0
 
             # normalize probabilities so that they sum to 1
             total_prob = sum(probabilities)
             if total_prob == 0:
-                probabilities = [1.0 / len(probabilities) for i in range(len(probabilities))]
+                probabilities = [1.0 / len(probabilities) for p in probabilities]
             else:
                 probabilities = [p / total_prob for p in probabilities]
-            
-            # if(sum(probabilities) < .99 or sum(probabilities) > 1.01):
-            #     print(probabilities, " with a sum of ", sum(probabilities))
             
             # set value back to an empty string
             value = ""

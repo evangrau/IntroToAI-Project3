@@ -184,8 +184,8 @@ for g in range(10000):
    # when running thousands of learning trials,
    #   periodic updates are nice confirmation
    #   that everything's still running
-   if (numWinX + numWinO + numTied) % 1000 == 0:
-      print( "Completed " + str(numWinX + numWinO + numTied) )
+   # if (numWinX + numWinO + numTied) % 1000 == 0:
+   #    print( "Completed " + str(numWinX + numWinO + numTied) )
 
 X.stopPlaying()
 O.stopPlaying()
