@@ -137,7 +137,7 @@ numWinO = 0
 numTied = 0
 
 # how many games do you want to play?
-for g in range(10000):
+for g in range(1000000):
    # reset global variables for new game
    gameboard = "--------------XO----OX--------------"
    gameover = False
@@ -184,12 +184,14 @@ for g in range(10000):
    # when running thousands of learning trials,
    #   periodic updates are nice confirmation
    #   that everything's still running
-   # if (numWinX + numWinO + numTied) % 1000 == 0:
-   #    print( "Completed " + str(numWinX + numWinO + numTied) )
+   if (numWinX + numWinO + numTied) % 10000 == 0:
+      progress = (numWinX + numWinO + numTied) / 10000
+      print( f"\r{progress:.0f}% complete", end="" )
 
 X.stopPlaying()
 O.stopPlaying()
 
-print( f"X   : {numWinX} games : {(numWinX / (numWinX + numWinO + numTied)) * 100:.1f}%" )
-print( f"O   : {numWinO} games : {(numWinO / (numWinX + numWinO + numTied)) * 100:.1f}%" )
-print( f"Tie : {numTied} games : {(numTied / (numWinX + numWinO + numTied)) * 100:.1f}%" )
+print( "\n" )
+print( f"X   : {numWinX} games : {(numWinX / (numWinX + numWinO + numTied)) * 100:.2f}%" )
+print( f"O   : {numWinO} games : {(numWinO / (numWinX + numWinO + numTied)) * 100:.2f}%" )
+print( f"Tie : {numTied} games : {(numTied / (numWinX + numWinO + numTied)) * 100:.2f}%" )

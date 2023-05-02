@@ -143,13 +143,14 @@ class Agent:
             if status == 1:
                 # agent won, add percentage/i to that prob and subtract the appropriate amount from the rest
                 mult = PERCENTAGE / (i + 1)
-                temp = 0
+                prob = 0
                 tile = 0
                 for j in range(len(elements)):
                     if elements[j] == self.moves[i]:
                         tile = elements[j]
-                        temp = probabilities[j] - (probabilities[j] * mult)
-                        probabilities[j] *= mult
+                        prob = probabilities[j] * mult
+                        temp = probabilities[j] - prob
+                        probabilities[j] += prob
                         break
                 for j in range(len(probabilities)):
                     if j != tile:
@@ -157,13 +158,14 @@ class Agent:
             elif status == -1:
                 # agent lost, decrease that prob by percentage/i and add the appropriate amount to the rest
                 mult = PERCENTAGE / (i + 1)
-                temp = 0
+                prob = 0
                 tile = 0
                 for j in range(len(elements)):
                     if elements[j] == self.moves[i]:
                         tile = elements[j]
-                        temp = probabilities[j] - (probabilities[j] * mult)
-                        probabilities[j] -= temp
+                        prob = probabilities[j] * mult
+                        temp = probabilities[j] - prob
+                        probabilities[j] -= prob
                         break
                 for j in range(len(probabilities)):
                     if j != tile:
