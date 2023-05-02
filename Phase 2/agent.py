@@ -207,3 +207,23 @@ class Agent:
                 line = f"{key},{value}\n"
                 file.write(line)
             file.close()
+
+def write_to_file():
+    kb_dict = {}
+    with open('Phase 2/move_knowledgebase.txt', 'r') as file:
+        for line in file:
+            items = line.strip().split(',')
+            key = items[0]
+            value = ','.join(items[1:])
+            kb_dict[key] = value
+
+    with open('move_kb_100000_sample.txt', 'w') as file:
+        count = 0
+        for key in kb_dict.keys():
+            if count == 100000:
+                break
+            value = kb_dict[key]
+            file.write(f"{key},{value}\n")
+            count += 1
+    
+write_to_file()
