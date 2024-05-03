@@ -143,6 +143,7 @@ class Agent:
             if status == 1:
                 # agent won, add percentage/i to that prob and subtract the appropriate amount from the rest
                 # test push for git webhook
+                # blee
                 mult = PERCENTAGE / (i + 1)
                 prob = 0
                 tile = 0
